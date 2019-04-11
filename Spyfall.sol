@@ -7,6 +7,9 @@ contract Spyfall {
     string[] public players;
     string public name;
     string private spy;
+    string private location;
+    
+    
 
 
 
