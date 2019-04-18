@@ -37,12 +37,17 @@ contract Spyfall {
     }
 
     
-    function putForthGuessOfWhoSpyIs(){
-    
+    function putForthGuessOfWhoSpyIs(guess){
+        //if(guess = spy){
+            //end game; non-spies win
+        //}
     }
 
-    function putForthGuessOfWhatPlaceIs() //requirement - must be spy{
-    
+    function putForthGuessOfWhatPlaceIs(guess) //requirement - must be spy{
+        //if(guess = location){
+              //end game
+              //spy wins
+        //}
     }
 
 }
