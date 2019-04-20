@@ -21,19 +21,20 @@ contract Spyfall {
     }
     
     function pickLocation(string[] locations) public{
-    
+        //pick location
+        location = locations[i]
     
     }
     
-    function sendQuestion(sender, recipient){
+    function sendQuestion(sender, recipient, question){
         //is sender=recipient?
             //if so, accept question
         //set receiver as new recipient
     }
     
-    function answerQuestion(recipient){
+    function answerQuestion(recipient, answer){
         //answer question
-    
+        //send answer
     }
 
     
