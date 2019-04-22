@@ -67,20 +67,24 @@ contract Spyfall {
 //https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
     }
 
+    function random(uint256 numPeopleOrLocations) private view returns (uint8) {
+        return uint8(uint256(keccak256(block.timestamp, block.difficulty))%numPeopleOrLocations);
+    }
+
 
     function nameSpy(string[] players) private{
-           //pickspy
-           spy = player[i]
+        //pickspy
+        spy = player[random(players.length-1)];
     }
     
     function nameQuestioner(string[] players) public{
-           //pick questioner
-           questioner = player[i]
+        //pick questioner
+        questioner = player[random(players.length-1)];
     }
     
     function pickLocation(string[] locations) public{
         //pick location
-        location = locations[i]
+        location = locations[random(locations.length -1)];
     
     }
     
@@ -101,17 +105,19 @@ contract Spyfall {
     }
 
     
-    function putForthGuessOfWhoSpyIs(guess){
-        //if(guess = spy){
+    function putForthGuessOfWhoSpyIs(string guess){
+        //if(compareStrings(guess, spy)){
             //end game; non-spies win
         //}
     }
 
-    function putForthGuessOfWhatPlaceIs(guess) //requirement - must be spy{
-        //if(guess = location){
+    function putForthGuessOfWhatPlaceIs(string guess) //requirement - must be spy{
+        //if(compareStrings(guess, location)){
               //end game
               //spy wins
         //}
     }
+    
+    
 
 }
