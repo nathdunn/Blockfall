@@ -6,6 +6,7 @@ contract Spyfall {
     // Remember: simple variables can be viewed with a CALL without having to define a getter function
     string[] public players;
     bool questionSent;
+    uint gameState = 0; //game state 0 means the game has not started
     string public questioner;
     string serialize = "";
     string private spy;
@@ -70,25 +71,34 @@ contract Spyfall {
         return uint8(uint256(keccak256(block.timestamp, block.difficulty))%numPeopleOrLocations);
     }
 
+    function startGame(string name) public{
+        require(gameState == 0 && Trojans[name] == msg.sender);
+        nameSpy();
+        nameQuestioner();
+        pickLocation();
+        gameState = 1; //game state 1 means the game has started
+        
+        
+    }
 
     function nameSpy() private{
         //pickspy
         spy = players[random(players.length-1)];
     }
     
-    function nameQuestioner() public{
+    function nameQuestioner() private{
         //pick questioner
         questioner = players[random(players.length-1)];
     }
     
-    function pickLocation() public{
+    function pickLocation() private{
         //pick location
         location = locations[random(locations.length -1)];
     
     }
     
-    function sendQuestion(string recipient, string question){
-        require(compareStrings(msg.sender, questioner) && questionSent ==false);
+    function sendQuestion(string sender, string recipient, string question){
+        require(compareStrings(sender, questioner) && Trojans[sender] == msg.sender && questionSent ==false && gameState == 1);
         questionSent = true;
         //say question
         //switch who can ask the next question
@@ -96,8 +106,8 @@ contract Spyfall {
         
     }
     
-    function answerQuestion(string recipient, string answer){
-        require(compareStrings(msg.sender,questioner) && questionSent == true);
+    function answerQuestion(string name, string recipient, string answer){
+        require(compareStrings(name,questioner) && Trojans[name] == msg.sender && questionSent == true && gameState ==1);
         questionSent = false;
         //answer question
         //send answer
@@ -105,14 +115,16 @@ contract Spyfall {
 
     
     function putForthGuessOfWhoSpyIs(string guess){
-        //if(compareStrings(guess, spy)){
-            //end game; non-spies win
-        //}
+        if(compareStrings(guess, spy)){
+            //non-spies win
+            gameState ==2;
+        }
     }
 
     function putForthGuessOfWhatPlaceIs(string guess){
-        //if(compareStrings(guess, location)){
-              //end game
+        if(compareStrings(guess, location)){
+              gameState ==2;
               //spy wins
         }
+    }
 }
