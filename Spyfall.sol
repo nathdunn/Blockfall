@@ -5,11 +5,12 @@ contract Spyfall {
 
     // Remember: simple variables can be viewed with a CALL without having to define a getter function
     string[] public players;
-    boolean questionSent;
+    bool questionSent;
     string public questioner;
+    string serialize = "";
     string private spy;
     string private location;
-    string[] public locations = {'Autoshop', 'Gas Station', 'Police Station', 'Fire Station', 'Film Studio', 'Beach'}
+    string[] public locations = ['Autoshop', 'Gas Station', 'Police Station', 'Fire Station', 'Film Studio', 'Beach'];
    
     mapping (string => address)Trojans;
     
@@ -24,7 +25,7 @@ contract Spyfall {
 
     function listPlayers() public view returns(string) {
         serialize="";
-        for(uint i=0; i<memberCount; i++) {
+        for(uint i=0; i<players.length; i++) {
             if (i>0){
                 serialize = string(abi.encodePacked(serialize, ", ")); //the idea for abi.encodedPacked comes from
                 //https://ethereum.stackexchange.com/questions/729/how-to-concatenate-strings-in-solidity
@@ -38,9 +39,8 @@ contract Spyfall {
      // Register a new Trojan account
     function registerTrojan(string name) public {
         // throw exception if user name is null or already registered
-        require( !compareStrings(name, "") && Trojans[name] == address(0) && memberCount<=10 );
+        require( !compareStrings(name, "") && Trojans[name] == address(0) && players.length<=10 );
         players.push(name);
-        memberCount ++;
         Trojans[name] = msg.sender;
     }
 
@@ -62,7 +62,6 @@ contract Spyfall {
         }
         delete players[players.length-1];
         players.length--;
-        memberCount --;
 // a lot of the modified code in this function comes from the following link
 //https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
     }
@@ -72,34 +71,34 @@ contract Spyfall {
     }
 
 
-    function nameSpy(string[] players) private{
+    function nameSpy() private{
         //pickspy
-        spy = player[random(players.length-1)];
+        spy = players[random(players.length-1)];
     }
     
-    function nameQuestioner(string[] players) public{
+    function nameQuestioner() public{
         //pick questioner
-        questioner = player[random(players.length-1)];
+        questioner = players[random(players.length-1)];
     }
     
-    function pickLocation(string[] locations) public{
+    function pickLocation() public{
         //pick location
         location = locations[random(locations.length -1)];
     
     }
     
-    function sendQuestion(recipient, question){
-        require(msg.sender ==questioner & questionSent ==false);
-        questionSent = True
+    function sendQuestion(string recipient, string question){
+        require(compareStrings(msg.sender, questioner) && questionSent ==false);
+        questionSent = true;
         //say question
         //switch who can ask the next question
         questioner = recipient;
         
     }
     
-    function answerQuestion(recipient, answer){
-        require(msg.sender == questioner & questionSent == True);
-        questionSent = False
+    function answerQuestion(string recipient, string answer){
+        require(compareStrings(msg.sender,questioner) && questionSent == true);
+        questionSent = false;
         //answer question
         //send answer
     }
@@ -111,13 +110,9 @@ contract Spyfall {
         //}
     }
 
-    function putForthGuessOfWhatPlaceIs(string guess) //requirement - must be spy{
+    function putForthGuessOfWhatPlaceIs(string guess){
         //if(compareStrings(guess, location)){
               //end game
               //spy wins
-        //}
-    }
-    
-    
-
+        }
 }
