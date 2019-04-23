@@ -37,8 +37,8 @@ contract Spyfall {
     }
     
     
-     // Register a new Trojan account
-    function registerTrojan(string name) public {
+     // Register a new Player account
+    function registerPlayer(string name) public {
         // throw exception if user name is null or already registered
         require( !compareStrings(name, "") && Trojans[name] == address(0) && players.length<=10 );
         players.push(name);
@@ -46,7 +46,7 @@ contract Spyfall {
     }
 
     // Delete a user account
-    function unregisterTrojan(string name) public {
+    function unregisterPlayer(string name) public {
         uint index=0;
         // ensure that the account exists and belongs to the sender
         require( Trojans[name] != address(0) && Trojans[name] == msg.sender );
@@ -72,29 +72,31 @@ contract Spyfall {
     }
 
     function startGame(string name) public{
-        require(gameState == 0 && Trojans[name] == msg.sender);
-        nameSpy();
-        nameQuestioner();
-        pickLocation();
+        require(gameState == 0 && Trojans[name] == msg.sender && players.length>=3);
+       // nameSpy();
+       // nameQuestioner();
+       // pickLocation();
         gameState = 1; //game state 1 means the game has started
         
         
     }
 
-    function nameSpy() private{
+    function nameSpy() public view returns(string){
         //pickspy
-        spy = players[random(players.length-1)];
+        spy = players[players.length-1 - random(players.length-1)];
+        return spy;
     }
     
-    function nameQuestioner() private{
+    function nameQuestioner() public view returns(string){
         //pick questioner
         questioner = players[random(players.length-1)];
+        return questioner;
     }
     
-    function pickLocation() private{
+    function pickLocation() public view returns(string){
         //pick location
         location = locations[random(locations.length -1)];
-    
+        return location;
     }
     
     function sendQuestion(string sender, string recipient, string question){
