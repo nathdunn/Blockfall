@@ -41,7 +41,9 @@ contract Spyfall {
     // Register a new Player account
     function registerPlayer(string name) public {
         // throw exception if user name is null or already registered
-        require( !compareStrings(name, "") && Trojans[name] == address(0) && players.length<=10 );
+        require(!compareStrings(name, ""), "Please enter your name.");
+        require(Trojans[name] == address(0), "There is a duplicate name.");
+        require(players.length<=10, "There cannot be more than 10 players, take turns and play multiple rounds :)" );
         players.push(name);
         Trojans[name] = msg.sender;
     }
@@ -50,7 +52,8 @@ contract Spyfall {
     function unregisterPlayer(string name) public {
         uint index=0;
         // ensure that the account exists and belongs to the sender
-        require( Trojans[name] != address(0) && Trojans[name] == msg.sender );
+        require(Trojans[name] != address(0), "You are not registered to begin with!");
+        require(Trojans[name] == msg.sender);
         for (uint i=0; i<players.length;i++){
             if(compareStrings(players[i], name)==true){
                 index = i;
@@ -73,7 +76,8 @@ contract Spyfall {
     }
 
     function startGame(string name) public{
-        require(gameState == 0 && Trojans[name] == msg.sender && players.length>=3);
+        require(gameState == 0, "The game has already started");
+        require(Trojans[name] == msg.sender && players.length>=3, "You must have 3 registered players before starting the game, get some friends!");
         // nameSpy();
         // nameQuestioner();
         // pickLocation();
@@ -101,7 +105,9 @@ contract Spyfall {
     }
     
     function sendQuestion(string sender, string recipient, string question){
-        require(compareStrings(sender, questioner) && Trojans[sender] == msg.sender && questionSent ==false && gameState == 1);
+        require(compareStrings(sender, questioner), "You are not the questioner.");
+        require(Trojans[sender] == msg.sender && questionSent ==false, "Nice try, the question has already been asked");
+        require(gameState == 1, "The game is not active.");
         questionSent = true;
         //say question
         //switch who can ask the next question
@@ -110,7 +116,8 @@ contract Spyfall {
     }
     
     function answerQuestion(string name, string recipient, string answer){
-        require(compareStrings(name,questioner) && Trojans[name] == msg.sender && questionSent == true && gameState ==1);
+        require(Trojans[name] == msg.sender && questionSent == true, "What are you trying to answer? The question has not been asked yet.");
+        require(gameState ==1, "The game is not active.");
         questionSent = false;
         //answer question
         //send answer
