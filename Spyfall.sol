@@ -86,11 +86,21 @@ contract Spyfall {
         
         
     }
+    
+    
+    function SpyorLocation(string name) public returns (string){
+        require(Trojans[name] == msg.sender);
+        if(compareStrings(name,spy)){
+            return spy;
+        }
+        else{
+            return location;
+        }
+    }
 
     function nameSpy() public view returns(string){
         //pickspy
         spy = players[players.length-1 - random(players.length-1)];
-        return spy;
     }
     
     function nameQuestioner() public view returns(string){
@@ -102,10 +112,9 @@ contract Spyfall {
     function pickLocation() public view returns(string){
         //pick location
         location = locations[random(locations.length -1)];
-        return location;
     }
     
-    function sendQuestion(string sender, string recipient, string question){
+    function sendQuestion(string sender, string recipient, string question)returns(string){
         require(compareStrings(sender, questioner), "You are not the questioner.");
         require(Trojans[sender] == msg.sender && questionSent ==false, "Nice try, the question has already been asked");
         require(gameState == 1, "The game is not active.");
@@ -113,16 +122,16 @@ contract Spyfall {
         //say question
         //switch who can ask the next question
         questioner = recipient;
-        
+        return question;
     }
     
-    function answerQuestion(string name, string recipient, string answer){
+    function answerQuestion(string name, string recipient, string answer) returns(string){
         require(Trojans[name] == msg.sender && compareStrings(name, questioner), "This is not your question to answer.");
         require(questionSent == true, "What are you trying to answer? The question has not been asked yet.");
         require(gameState ==1, "The game is not active.");
         questionSent = false;
         //answer question
-        //send answer
+        return answer;
     }
 
     
