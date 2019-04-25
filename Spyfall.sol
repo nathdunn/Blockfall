@@ -31,13 +31,14 @@ contract Spyfall {
                 serialize = string(abi.encodePacked(serialize, ", ")); //the idea for abi.encodedPacked comes from
                 //https://ethereum.stackexchange.com/questions/729/how-to-concatenate-strings-in-solidity
             }
-                serialize = string(abi.encodePacked(serialize, players[i]));    
+
+            serialize = string(abi.encodePacked(serialize, players[i]));    
         }
         return serialize;
     }
     
     
-     // Register a new Player account
+    // Register a new Player account
     function registerPlayer(string name) public {
         // throw exception if user name is null or already registered
         require( !compareStrings(name, "") && Trojans[name] == address(0) && players.length<=10 );
@@ -63,8 +64,8 @@ contract Spyfall {
         }
         delete players[players.length-1];
         players.length--;
-// a lot of the modified code in this function comes from the following link
-//https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
+        // a lot of the modified code in this function comes from the following link
+        //https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
     }
 
     function random(uint256 numPeopleOrLocations) private view returns (uint8) {
@@ -73,9 +74,9 @@ contract Spyfall {
 
     function startGame(string name) public{
         require(gameState == 0 && Trojans[name] == msg.sender && players.length>=3);
-       // nameSpy();
-       // nameQuestioner();
-       // pickLocation();
+        // nameSpy();
+        // nameQuestioner();
+        // pickLocation();
         gameState = 1; //game state 1 means the game has started
         
         
@@ -125,8 +126,8 @@ contract Spyfall {
 
     function putForthGuessOfWhatPlaceIs(string guess){
         if(compareStrings(guess, location)){
-              gameState ==2;
-              //spy wins
+            gameState ==2;
+            //spy wins
         }
     }
 }
