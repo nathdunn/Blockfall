@@ -7,11 +7,12 @@ contract Spyfall {
     string[] public players;
     bool questionSent;
     uint gameState = 0; //game state 0 means the game has not started
-    string public questioner;
+    string questioner = "";
     string serialize = "";
     string private spy;
     string private location;
     string[] public locations = ['Autoshop', 'Gas Station', 'Police Station', 'Fire Station', 'Film Studio', 'Beach'];
+    string winner;
    
     mapping (string => address)Trojans;
     
@@ -116,8 +117,8 @@ contract Spyfall {
     }
     
     function answerQuestion(string name, string recipient, string answer){
-        require(Trojans[name] == questioner, "This is not your question to answer.");
-        require(Trojans[name] == msg.sender && questionSent == true, "What are you trying to answer? The question has not been asked yet.");
+        require(Trojans[name] == msg.sender && compareStrings(name, questioner), "This is not your question to answer.");
+        require(questionSent == true, "What are you trying to answer? The question has not been asked yet.");
         require(gameState ==1, "The game is not active.");
         questionSent = false;
         //answer question
@@ -129,6 +130,7 @@ contract Spyfall {
         if(compareStrings(guess, spy)){
             //non-spies win
             gameState ==2;
+            winner = "non-spies";
         }
     }
 
@@ -136,6 +138,12 @@ contract Spyfall {
         if(compareStrings(guess, location)){
             gameState ==2;
             //spy wins
+            winner = "Spy";
         }
+    }
+    
+    function whoWon() returns(string){
+        require(gameState==2);
+        return winner;
     }
 }
