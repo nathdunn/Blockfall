@@ -22,7 +22,7 @@ contract Spyfall {
         return keccak256(a) == keccak256(b);
     }
     
-    function listPlayers() public returns(string) {
+    function listPlayers() public view returns(string) {
         serialize="";
         for(uint i=0; i<players.length; i++) {
             if (i>0){
