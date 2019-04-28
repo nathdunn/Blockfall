@@ -99,18 +99,24 @@ contract Spyfall {
         //send answer
     }
     
-    function putForthGuessOfWhoSpyIs(string guess){
+    function putForthGuessOfWhoSpyIs(string guess)public{
         if(compareStrings(guess, spy)){
             //non-spies win
-            gameState ==2;
+            
         }
+        else {
+            //spies win
+        }
+        gameState ==2;
     }
-    
-    function putForthGuessOfWhatPlaceIs(string guess){
+    function putForthGuessOfWhatPlaceIs(string guess)public{
         if(compareStrings(guess, location)){
-            gameState ==2;
             //spy wins
         }
+        else{
+            //non-spies win
+        }
+        gameState ==2;
     }
     
     function whatAmI(string name) public view returns(string){
