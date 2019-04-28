@@ -20,7 +20,7 @@ contract Spyfall {
     function compareStrings (string a, string b) view returns (bool){
         return keccak256(a) == keccak256(b);
     }
-    function listPlayers() public view returns(string) {
+    function listPlayers() public returns(string) {
         serialize="";
         for(uint i=0; i<players.length; i++) {
             if (i>0){
@@ -66,32 +66,15 @@ contract Spyfall {
     function random(uint256 numPeopleOrLocations) private view returns (uint8) {
         return uint8(uint256(keccak256(block.timestamp, block.difficulty))%numPeopleOrLocations);
     }
-    function startGame(string name) public{
+    function startGame(string name) public returns(string){
         require(gameState == 0, "The game has already started");
         require(Trojans[name] == msg.sender && players.length>=3, "You must have 3 registered players before starting the game, get some friends!");
-        // nameSpy();
-        // nameQuestioner();
-        // pickLocation();
-        gameState = 1; //game state 1 means the game has started
-        
-        
-    }
-    function nameSpy() public view returns(string){
-        //pickspy
         spy = players[players.length-1 - random(players.length-1)];
-        return spy;
-    }
-    
-    function nameQuestioner() public view returns(string){
-        //pick questioner
         questioner = players[random(players.length-1)];
+        location = locations[random(locations.length-1)];
+        gameState = 1; //game state 1 means the game has started
         return questioner;
-    }
-    
-    function pickLocation() public view returns(string){
-        //pick location
-        location = locations[random(locations.length -1)];
-        return location;
+        
     }
     
     function sendQuestion(string sender, string recipient, string question){
