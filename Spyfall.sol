@@ -17,9 +17,11 @@ contract Spyfall {
     
     
     }
+    
     function compareStrings (string a, string b) view returns (bool){
         return keccak256(a) == keccak256(b);
     }
+    
     function listPlayers() public view returns(string) {
         serialize="";
         for(uint i=0; i<players.length; i++) {
@@ -42,6 +44,7 @@ contract Spyfall {
         players.push(name);
         Trojans[name] = msg.sender;
     }
+    
     // Delete a user account
     function unregisterPlayer(string name) public {
         uint index=0;
@@ -63,9 +66,11 @@ contract Spyfall {
         // a lot of the modified code in this function comes from the following link
         //https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
     }
+    
     function random(uint256 numPeopleOrLocations) private view returns (uint8) {
         return uint8(uint256(keccak256(block.timestamp, block.difficulty))%numPeopleOrLocations);
     }
+    
     function startGame(string name) public{
         require(gameState == 0, "The game has already started");
         require(Trojans[name] == msg.sender && players.length>=3, "You must have 3 registered players before starting the game, get some friends!");
@@ -76,6 +81,7 @@ contract Spyfall {
         
         
     }
+    
     function nameSpy() public view returns(string){
         //pickspy
         spy = players[players.length-1 - random(players.length-1)];
@@ -119,10 +125,21 @@ contract Spyfall {
             gameState ==2;
         }
     }
+    
     function putForthGuessOfWhatPlaceIs(string guess){
         if(compareStrings(guess, location)){
             gameState ==2;
             //spy wins
+        }
+    }
+    
+    function whatAmI(string name) public view returns(string){
+        require(Trojans[name] == msg.sender);
+        if(compareStrings(spy, name)){
+            return ("You are the spy! Shhh");
+        }
+        else{
+            return ("You are not the spy.");
         }
     }
 }
