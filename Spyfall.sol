@@ -12,6 +12,7 @@ contract Spyfall {
     string[] public locations = ['Autoshop', 'Gas Station', 'Police Station', 'Fire Station', 'Film Studio', 'Beach'];
    
     mapping (string => address)Trojans;
+    mapping (string => int)Votes;
     
     constructor()public{
     
@@ -128,5 +129,9 @@ contract Spyfall {
         else{
             return ("You are not the spy.");
         }
+    }
+    
+    function vote(String name) public{
+        
     }
 }
