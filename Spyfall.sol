@@ -92,6 +92,7 @@ contract Spyfall {
     }
 
     function answerQuestion(string name, string answer){
+        require(compareStrings(name, questioner), "You are not the recipient.");
         require(Trojans[name] == msg.sender && questionSent == true, "What are you trying to answer? The question has not been asked yet.");
         require(gameState ==1, "The game is not active.");
         questionSent = false;
