@@ -12,7 +12,7 @@ contract Spyfall {
     string[] public locations = ['Autoshop', 'Gas Station', 'Police Station', 'Fire Station', 'Film Studio', 'Beach'];
    
     mapping (string => address)Trojans;
-    mapping (string => int)Votes;
+    mapping (string => uint)Votes;
     
     constructor()public{
     
@@ -131,7 +131,10 @@ contract Spyfall {
         }
     }
     
-    function vote(String name) public{
-        
+    function vote(string name) public{
+        Votes[name] = Votes[name] + 1;
+        if(Votes[name] == players.length-1 && compareStrings(name, spy)){
+            //non-spies win
+        }
     }
 }
