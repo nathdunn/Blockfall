@@ -10,19 +10,20 @@ contract Spyfall {
     string private spy;
     string private location;
     string[] public locations = ['Autoshop', 'Gas Station', 'Police Station', 'Fire Station', 'Film Studio', 'Beach'];
-   
+
     mapping (string => address)Trojans;
     mapping (string => uint)Votes;
-    
+    mapping (address => bool)addresses;
+
     constructor()public{
-    
-    
+
+
     }
-    
+
     function compareStrings (string a, string b) view returns (bool){
         return keccak256(a) == keccak256(b);
     }
-    
+
     function listPlayers() public view returns(string) {
         serialize="";
         for(uint i=0; i<players.length; i++) {
@@ -30,19 +31,21 @@ contract Spyfall {
                 serialize = string(abi.encodePacked(serialize, ", ")); //the idea for abi.encodedPacked comes from
                 //https://ethereum.stackexchange.com/questions/729/how-to-concatenate-strings-in-solidity
             }
-            serialize = string(abi.encodePacked(serialize, players[i]));    
+            serialize = string(abi.encodePacked(serialize, players[i]));
         }
         return serialize;
     }
-    
+
     // Register a new Player account
     function registerPlayer(string name) public {
         // throw exception if user name is null or already registered
         require(!compareStrings(name, ""), "Please enter your name.");
         require(Trojans[name] == address(0), "There is a duplicate name.");
+        require(addresses[msg.sender] != true, "You have already registered");
         require(players.length<=10, "There cannot be more than 10 players, take turns and play multiple rounds :)" );
         players.push(name);
         Trojans[name] = msg.sender;
+        addresses[msg.sender] = true;
     }
     // Delete a user account
     function unregisterPlayer(string name) public {
@@ -55,7 +58,8 @@ contract Spyfall {
                 index = i;
             }
         }
-        Trojans[name] = address(0);    
+        Trojans[name] = address(0);
+        addresses[msg.sender] = false;
         if (index >= players.length) return;
         for (uint j = index; j<players.length-1; j++){
             players[j] = players[j+1];
@@ -65,11 +69,11 @@ contract Spyfall {
         // a lot of the modified code in this function comes from the following link
         //https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
     }
-    
+
     function random(uint256 numPeopleOrLocations) private view returns (uint8) {
         return uint8(uint256(keccak256(block.timestamp, block.difficulty))%numPeopleOrLocations);
     }
-    
+
     function startGame(string name) public returns(string){
         require(gameState == 0, "The game has already started");
         require(Trojans[name] == msg.sender && players.length>=3, "You must have 3 registered players before starting the game, get some friends!");
@@ -78,9 +82,9 @@ contract Spyfall {
         location = locations[random(locations.length-1)];
         gameState = 1; //game state 1 means the game has started
         return questioner;
-        
+
     }
-    
+
     function sendQuestion(string sender, string recipient, string question){
         require(compareStrings(sender, questioner), "You are not the questioner.");
         require(Trojans[sender] == msg.sender && questionSent ==false, "Nice try, the question has already been asked");
@@ -89,7 +93,7 @@ contract Spyfall {
         //say question
         //switch who can ask the next question
         questioner = recipient;
-        
+
     }
 
     function answerQuestion(string name, string answer){
@@ -100,11 +104,11 @@ contract Spyfall {
         //answer question
         //send answer
     }
-    
+
     function putForthGuessOfWhoSpyIs(string guess)public{
         if(compareStrings(guess, spy)){
             //non-spies win
-            
+
         }
         else {
             //spies win
@@ -120,7 +124,7 @@ contract Spyfall {
         }
         gameState ==2;
     }
-    
+
     function whatAmI(string name) public view returns(string){
         require(Trojans[name] == msg.sender);
         if(compareStrings(spy, name)){
