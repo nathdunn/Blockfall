@@ -8,6 +8,8 @@ contract Spyfall {
     string public questioner;
     string serialize = "";
     string private spy;
+    uint256 public game_start;
+    uint256 public game_end;
     string private location;
     string[] public locations = ['Autoshop', 'Gas Station', 'Police Station', 'Fire Station', 'Film Studio', 'Beach'];
 
@@ -16,15 +18,19 @@ contract Spyfall {
     mapping (address => bool)addresses;
 
     constructor()public{
-
-
+        
     }
-
-    function compareStrings (string a, string b) view returns (bool){
+    
+    modifier an_ongoing_game(){
+        require(now <= game_end, "The game is over!");
+        _;
+    }
+    
+    function compareStrings (string a, string b) public view returns (bool){
         return keccak256(a) == keccak256(b);
     }
 
-    function listPlayers() public view returns(string) {
+    function listPlayers() public an_ongoing_game() view returns(string) {
         serialize="";
         for(uint i=0; i<players.length; i++) {
             if (i>0){
@@ -37,7 +43,7 @@ contract Spyfall {
     }
 
     // Register a new Player account
-    function registerPlayer(string name) public {
+    function registerPlayer(string name) public an_ongoing_game() {
         // throw exception if user name is null or already registered
         require(!compareStrings(name, ""), "Please enter your name.");
         require(Trojans[name] == address(0), "There is a duplicate name.");
@@ -48,7 +54,7 @@ contract Spyfall {
         addresses[msg.sender] = true;
     }
     // Delete a user account
-    function unregisterPlayer(string name) public {
+    function unregisterPlayer(string name) public an_ongoing_game(){
         uint index=0;
         // ensure that the account exists and belongs to the sender
         require(Trojans[name] != address(0), "You are not registered to begin with!");
@@ -77,6 +83,8 @@ contract Spyfall {
     function startGame(string name) public returns(string){
         require(gameState == 0, "The game has already started");
         require(Trojans[name] == msg.sender && players.length>=3, "You must have 3 registered players before starting the game, get some friends!");
+        game_start = now;
+        game_end = now + 8 minutes;
         spy = players[players.length-1 - random(players.length-1)];
         questioner = players[random(players.length-1)];
         location = locations[random(locations.length-1)];
@@ -85,7 +93,7 @@ contract Spyfall {
 
     }
 
-    function sendQuestion(string sender, string recipient, string question){
+    function sendQuestion(string sender, string recipient, string question) public an_ongoing_game(){
         require(compareStrings(sender, questioner), "You are not the questioner.");
         require(Trojans[sender] == msg.sender && questionSent ==false, "Nice try, the question has already been asked");
         require(gameState == 1, "The game is not active.");
@@ -96,7 +104,7 @@ contract Spyfall {
 
     }
 
-    function answerQuestion(string name, string answer){
+    function answerQuestion(string name, string answer) public  an_ongoing_game(){
         require(compareStrings(name, questioner), "You are not the recipient.");
         require(Trojans[name] == msg.sender && questionSent == true, "What are you trying to answer? The question has not been asked yet.");
         require(gameState ==1, "The game is not active.");
@@ -105,7 +113,7 @@ contract Spyfall {
         //send answer
     }
 
-    function putForthGuessOfWhoSpyIs(string guess)public{
+    function putForthGuessOfWhoSpyIs(string guess) public view an_ongoing_game(){
         if(compareStrings(guess, spy)){
             //non-spies win
 
@@ -115,7 +123,7 @@ contract Spyfall {
         }
         gameState ==2;
     }
-    function putForthGuessOfWhatPlaceIs(string guess)public{
+    function putForthGuessOfWhatPlaceIs(string guess) public view an_ongoing_game(){
         if(compareStrings(guess, location)){
             //spy wins
         }
@@ -125,7 +133,7 @@ contract Spyfall {
         gameState ==2;
     }
 
-    function whatAmI(string name) public view returns(string){
+    function whatAmI(string name) public view an_ongoing_game() returns(string){
         require(Trojans[name] == msg.sender);
         if(compareStrings(spy, name)){
             return ("You are the spy! Shhh");
@@ -135,7 +143,7 @@ contract Spyfall {
         }
     }
     
-    function vote(string name) public{
+    function vote(string name) public an_ongoing_game(){
         Votes[name] = Votes[name] + 1;
         if(Votes[name] == players.length-1 && compareStrings(name, spy)){
             //non-spies win
