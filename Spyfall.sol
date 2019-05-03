@@ -26,6 +26,7 @@ contract Spyfall {
     
     modifier an_ongoing_game(){
         require(now <= game_end, "The game is over!");
+        require(gameState == 1, "The game is over!");
         _;
     }
     
@@ -143,14 +144,17 @@ contract Spyfall {
         }
         gameState ==2;
     }
-    function putForthGuessOfWhatPlaceIs(string guess) public view an_ongoing_game(){
+    function putForthGuessOfWhatPlaceIs(string guess) public view an_ongoing_game() returns(string){
         if(compareStrings(guess, location)){
-            //spy wins
+            game_end = now;
+            gameState = 2;
+            return("The spy has won!!");
         }
         else{
-            //non-spies win
+            game_end = now;
+            gameState = 2;
+            return("The non-spies have won!!");
         }
-        gameState ==2;
     }
 
     function whatAmI(string name) public view an_ongoing_game() returns(string){
@@ -172,10 +176,15 @@ contract Spyfall {
             return location;
     }
     
-    function vote(string name) public an_ongoing_game(){
+    function vote(string name) public an_ongoing_game() returns (string){
         Votes[name] = Votes[name] + 1;
         if(Votes[name] == players.length-1 && compareStrings(name, spy)){
-            //non-spies win
+            game_end = now;
+            gameState = 2;
+            return("The non-spies have won!!");
+        }
+        else{
+            return("Your vote has been cast.");
         }
     }
     
