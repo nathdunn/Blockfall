@@ -4,6 +4,7 @@ contract Spyfall {
     // Remember: simple variables can be viewed with a CALL without having to define a getter function
     string[] public players;
     bool questionSent;
+    bool answerSent;
     uint gameState = 0; //game state 0 means the game has not started
     string public questioner;
     string serialize = "";
@@ -11,6 +12,8 @@ contract Spyfall {
     uint256 public game_start;
     uint256 public game_end;
     string private location;
+    string public question;
+    string public answer;
     string[] public locations = ['Autoshop', 'Gas Station', 'Police Station', 'Fire Station', 'Film Studio', 'Beach'];
 
     mapping (string => address)Trojans;
@@ -43,7 +46,7 @@ contract Spyfall {
     }
 
     // Register a new Player account
-    function registerPlayer(string name) public an_ongoing_game() {
+    function registerPlayer(string name) public {
         // throw exception if user name is null or already registered
         require(!compareStrings(name, ""), "Please enter your name.");
         require(Trojans[name] == address(0), "There is a duplicate name.");
@@ -93,23 +96,27 @@ contract Spyfall {
 
     }
 
-    function sendQuestion(string sender, string recipient, string question) public an_ongoing_game(){
+    function sendQuestion(string sender, string recipient, string quest) public an_ongoing_game(){
         require(compareStrings(sender, questioner), "You are not the questioner.");
         require(Trojans[sender] == msg.sender && questionSent ==false, "Nice try, the question has already been asked");
         require(gameState == 1, "The game is not active.");
         questionSent = true;
         //say question
         //switch who can ask the next question
+        question = quest;
         questioner = recipient;
+        answerSent = false;
 
     }
 
-    function answerQuestion(string name, string answer) public  an_ongoing_game(){
+    function answerQuestion(string name, string answ) public  an_ongoing_game(){
         require(compareStrings(name, questioner), "You are not the recipient.");
         require(Trojans[name] == msg.sender && questionSent == true, "What are you trying to answer? The question has not been asked yet.");
         require(gameState ==1, "The game is not active.");
         questionSent = false;
-        //answer question
+        answer = answ;
+        answerSent = true;
+        
         //send answer
     }
 
@@ -147,6 +154,24 @@ contract Spyfall {
         Votes[name] = Votes[name] + 1;
         if(Votes[name] == players.length-1 && compareStrings(name, spy)){
             //non-spies win
+        }
+    }
+    
+    function viewQuestion() public view an_ongoing_game() returns(string){
+        if(questionSent){
+            return question;
+        }
+        else{
+            return ("The question has not been asked yet");
+        }
+    }
+    
+    function viewAnswer() public view an_ongoing_game() returns(string){
+        if(answerSent){
+            return answer;
+        }
+        else{
+            return ("The question has not been answered yet");
         }
     }
 }
