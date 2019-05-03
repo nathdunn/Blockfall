@@ -33,7 +33,7 @@ contract Spyfall {
         return keccak256(a) == keccak256(b);
     }
 
-    function listPlayers() public an_ongoing_game() view returns(string) {
+    function listPlayers() public view returns(string) {
         serialize="";
         for(uint i=0; i<players.length; i++) {
             if (i>0){
@@ -44,10 +44,23 @@ contract Spyfall {
         }
         return serialize;
     }
+    
+    function listLocations() public view returns(string){
+        serialize="";
+        for(uint i=0; i<locations.length; i++) {
+            if (i>0){
+                serialize = string(abi.encodePacked(serialize, ", ")); //the idea for abi.encodedPacked comes from
+                //https://ethereum.stackexchange.com/questions/729/how-to-concatenate-strings-in-solidity
+            }
+            serialize = string(abi.encodePacked(serialize, locations[i]));
+        }
+        return serialize;
+    }
 
     // Register a new Player account
     function registerPlayer(string name) public {
         // throw exception if user name is null or already registered
+        require(now>game_end, "The game has already started.");
         require(!compareStrings(name, ""), "Please enter your name.");
         require(Trojans[name] == address(0), "There is a duplicate name.");
         require(addresses[msg.sender] != true, "You have already registered");
