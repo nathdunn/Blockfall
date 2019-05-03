@@ -44,6 +44,18 @@ contract Spyfall {
         }
         return serialize;
     }
+    
+    function listLocations() public view returns(string){
+        serialize="";
+        for(uint i=0; i<locations.length; i++) {
+            if (i>0){
+                serialize = string(abi.encodePacked(serialize, ", ")); //the idea for abi.encodedPacked comes from
+                //https://ethereum.stackexchange.com/questions/729/how-to-concatenate-strings-in-solidity
+            }
+            serialize = string(abi.encodePacked(serialize, locations[i]));
+        }
+        return serialize;
+    }
 
     // Register a new Player account
     function registerPlayer(string name) public {
