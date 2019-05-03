@@ -159,8 +159,17 @@ contract Spyfall {
             return ("You are the spy! Shhh");
         }
         else{
-            return ("You are not the spy.");
+            return ("You are not the spy. Check the location.");
         }
+    }
+    
+    function checkLocation(string name) public view an_ongoing_game() returns(string){
+        require(Trojans[name] == msg.sender);
+        if(compareStrings(spy, name)){
+            return ("You don't get to know the location! You're the spy!");
+        }
+        else
+            return location;
     }
     
     function vote(string name) public an_ongoing_game(){
