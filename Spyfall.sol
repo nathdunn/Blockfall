@@ -2,19 +2,20 @@ pragma solidity ^0.4.25; //we can change this
 contract Spyfall {
     // Data Types
     // Remember: simple variables can be viewed with a CALL without having to define a getter function
-    string[] public players;
+    string[] private players;
     bool questionSent;
     bool answerSent;
     uint gameState = 0; //game state 0 means the game has not started
     string public questioner;
     string serialize = "";
     string private spy;
-    uint256 public game_start;
-    uint256 public game_end;
+    uint256 private game_start;
+    uint256 private game_end;
     string private location;
-    string public question;
-    string public answer;
-    string[] public locations = ['Autoshop', 'Gas Station', 'Police Station', 'Fire Station', 'Film Studio', 'Beach'];
+    string private question;
+    string private answer;
+    string public winners;
+    string[] private locations = ['Autoshop', 'Gas Station', 'Police Station', 'Fire Station', 'Film Studio', 'Beach'];
 
     mapping (string => address)Trojans;
     mapping (string => uint)Votes;
@@ -30,7 +31,7 @@ contract Spyfall {
         _;
     }
     
-    function compareStrings (string a, string b) public view returns (bool){
+    function compareStrings (string a, string b) private view returns (bool){
         return keccak256(a) == keccak256(b);
     }
 
@@ -101,7 +102,7 @@ contract Spyfall {
         require(gameState == 0, "The game has already started");
         require(Trojans[name] == msg.sender && players.length>=3, "You must have 3 registered players before starting the game, get some friends!");
         game_start = now;
-        game_end = now + 8 minutes;
+        game_end = now + 15 minutes;
         spy = players[players.length-1 - random(players.length-1)];
         questioner = players[random(players.length-1)];
         location = locations[random(locations.length-1)];
@@ -134,13 +135,19 @@ contract Spyfall {
         //send answer
     }
 
-    function putForthGuessOfWhoSpyIs(string guess) public view an_ongoing_game(){
+    function putForthGuessOfWhoSpyIs(string guess) public view an_ongoing_game() returns(string){
         if(compareStrings(guess, spy)){
-            //non-spies win
+           game_end = now;
+            gameState = 2;
+            winners = "non-spies";
+            return("The non-spies have won!!");
 
         }
         else {
-            //spies win
+            game_end = now;
+            gameState = 2;
+            winners = "spy";
+            return("The spy has won!!");
         }
         gameState ==2;
     }
@@ -148,11 +155,13 @@ contract Spyfall {
         if(compareStrings(guess, location)){
             game_end = now;
             gameState = 2;
+            winners = "spy";
             return("The spy has won!!");
         }
         else{
             game_end = now;
             gameState = 2;
+            winners = "non-spies";
             return("The non-spies have won!!");
         }
     }
