@@ -22,15 +22,19 @@ contract Spyfall {
     mapping (address => bool)addresses;
 
     constructor()public{
-        
+
     }
-    
+
     modifier an_ongoing_game(){
         require(now <= game_end, "The game is over!");
         require(gameState == 1, "The game is over!");
         _;
     }
-    
+
+    function numVotes(string name) public view returns(uint) {
+        return Votes[name];
+    }
+
     function compareStrings (string a, string b) private view returns (bool){
         return keccak256(a) == keccak256(b);
     }
@@ -46,7 +50,7 @@ contract Spyfall {
         }
         return serialize;
     }
-    
+
     function listLocations() public view returns(string){
         serialize="";
         for(uint i=0; i<locations.length; i++) {
@@ -131,7 +135,7 @@ contract Spyfall {
         questionSent = false;
         answer = answ;
         answerSent = true;
-        
+
         //send answer
     }
 
@@ -159,7 +163,7 @@ contract Spyfall {
             return ("You are not the spy. Check the location.");
         }
     }
-    
+
     function checkLocation(string name) public view an_ongoing_game() returns(string){
         require(Trojans[name] == msg.sender);
         if(compareStrings(spy, name)){
@@ -168,19 +172,20 @@ contract Spyfall {
         else
             return location;
     }
-    
-    function vote(string name) public an_ongoing_game() returns (string){
+
+    function vote(string name) public returns (string){
         Votes[name] = Votes[name] + 1;
         if(Votes[name] == players.length-1 && compareStrings(name, spy)){
             game_end = now;
             gameState = 2;
+            winners = "non-spies";
             return("The non-spies have won!!");
         }
         else{
             return("Your vote has been cast.");
         }
     }
-    
+
     function viewQuestion() public view an_ongoing_game() returns(string){
         if(questionSent){
             return question;
@@ -189,7 +194,7 @@ contract Spyfall {
             return ("The question has not been asked yet");
         }
     }
-    
+
     function viewAnswer() public view an_ongoing_game() returns(string){
         if(answerSent){
             return answer;
