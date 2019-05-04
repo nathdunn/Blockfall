@@ -135,23 +135,7 @@ contract Spyfall {
         //send answer
     }
 
-    function putForthGuessOfWhoSpyIs(string guess) public view an_ongoing_game() returns(string){
-        if(compareStrings(guess, spy)){
-           game_end = now;
-            gameState = 2;
-            winners = "non-spies";
-            return("The non-spies have won!!");
-
-        }
-        else {
-            game_end = now;
-            gameState = 2;
-            winners = "spy";
-            return("The spy has won!!");
-        }
-        gameState ==2;
-    }
-    function putForthGuessOfWhatPlaceIs(string guess) public view an_ongoing_game() returns(string){
+    function guessLocation(string guess) public view an_ongoing_game() returns(string){
         if(compareStrings(guess, location)){
             game_end = now;
             gameState = 2;
